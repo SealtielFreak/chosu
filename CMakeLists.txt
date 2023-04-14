@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(chosu C)
+project(Chosu C)
 
 set(CMAKE_C_STANDARD 23)
 
@@ -31,5 +31,5 @@ endif ()
 include_directories(ext/src)
 include_directories(ext/include)
 
-add_library(chosu ext/src/ext.c)
-target_link_libraries(chosu PRIVATE Ruby csfml-graphics csfml-audio csfml-network csfml-window csfml-system)
+add_library(Chosu ext/src/ext.c ext/src/window.c ext/include/window.h)
+target_link_libraries(Chosu PRIVATE Ruby csfml-graphics csfml-audio csfml-network csfml-window csfml-system)

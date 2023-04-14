@@ -2,7 +2,6 @@
 
 #include "SFML/Graphics.h"
 
-#include <ruby.h>
 #include <stdio.h>
 
 static VALUE rb_mChosu;
