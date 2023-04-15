@@ -225,7 +225,7 @@ void Init_event_klass(VALUE rb_module) {
 
     rb_sJoystickMoveEvent = rb_struct_define("JoystickMoveEvent", "id", "axis", "position", NULL);
     rb_sJoystickButtonEvent = rb_struct_define("JoystickButtonEvent", "id", "button", NULL);
-    rb_sJoystickConnectEvent = rb_struct_define("JoystickConnectEvent ", "id", NULL);
+    rb_sJoystickConnectEvent = rb_struct_define("JoystickConnectEvent", "id", NULL);
 
     rb_sTouchEvent = rb_struct_define("TouchEvent", "finger", "x", "y", NULL);
     rb_sSensorEvent = rb_struct_define("SensorEvent", "type", "x", "y", "z", NULL);
