@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.24)
 project(Chosu C)
 
-set(CMAKE_C_STANDARD 23)
+set(CMAKE_CPP_STANDARD 23)
 
 include(FetchContent)
 
@@ -31,5 +31,5 @@ endif ()
 include_directories(ext/src)
 include_directories(ext/include)
 
-add_library(Chosu ext/src/ext.c ext/src/window.c ext/include/window.h)
+add_library(Chosu ext/src/ext.c ext/src/window.c ext/include/module/window.h ext/src/event.c ext/include/module/event.h ext/src/ostruct.c ext/include/ostruct.h ext/include/boolean.h)
 target_link_libraries(Chosu PRIVATE Ruby csfml-graphics csfml-audio csfml-network csfml-window csfml-system)

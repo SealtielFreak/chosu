@@ -42,3 +42,11 @@ void raise_method_no_implemented(const char *method) {
 
     }
 }
+
+void raise_message_exception(const char *type) {
+    char msg[MSG_LENGTH];
+
+    sprintf(msg, "%s", type);
+
+    rb_raise(rb_eException, "%s", msg);
+}
