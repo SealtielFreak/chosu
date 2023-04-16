@@ -31,5 +31,5 @@ endif ()
 include_directories(ext/src)
 include_directories(ext/include)
 
-add_library(Chosu ext/src/ext.c ext/src/window.c ext/include/module/window.h ext/src/events.c ext/include/module/events.h ext/src/ostruct.c ext/include/ostruct.h ext/include/boolean.h ext/src/casting.c ext/include/casting.h ext/src/demo_3d.c ext/include/demo_3d.h)
+add_library(Chosu ext/src/ext.c ext/src/window.c ext/include/module/window.h ext/src/events.c ext/include/module/events.h ext/src/ostruct.c ext/include/ostruct.h ext/include/boolean.h ext/src/casting.c ext/include/casting.h ext/src/demo_3d.c ext/include/demo_3d.h ext/include/module/keyboard.c ext/include/module/keyboard.h)
 target_link_libraries(Chosu PRIVATE Ruby csfml-graphics csfml-audio csfml-network csfml-window csfml-system)

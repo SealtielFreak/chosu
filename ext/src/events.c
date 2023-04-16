@@ -8,21 +8,21 @@
 #include <stdlib.h>
 #include <string.h>
 
-static VALUE rb_mEvent;
+static VALUE rb_mEvent = Qnil;
 
-static VALUE rb_sEvent;
-static VALUE rb_sSizeEvent;
-static VALUE rb_sKeyEvent;
-static VALUE rb_sTextEvent;
-static VALUE rb_sMouseMoveEvent;
-static VALUE rb_sMouseButtonEvent;
-static VALUE rb_sMouseWheelEvent;
-static VALUE rb_sMouseWheelScrollEvent;
-static VALUE rb_sJoystickMoveEvent;
-static VALUE rb_sJoystickButtonEvent;
-static VALUE rb_sJoystickConnectEvent;
-static VALUE rb_sTouchEvent;
-static VALUE rb_sSensorEvent;
+static VALUE rb_sEvent = Qnil;
+static VALUE rb_sSizeEvent = Qnil;
+static VALUE rb_sKeyEvent = Qnil;
+static VALUE rb_sTextEvent = Qnil;
+static VALUE rb_sMouseMoveEvent = Qnil;
+static VALUE rb_sMouseButtonEvent = Qnil;
+static VALUE rb_sMouseWheelEvent = Qnil;
+static VALUE rb_sMouseWheelScrollEvent = Qnil;
+static VALUE rb_sJoystickMoveEvent = Qnil;
+static VALUE rb_sJoystickButtonEvent = Qnil;
+static VALUE rb_sJoystickConnectEvent = Qnil;
+static VALUE rb_sTouchEvent = Qnil;
+static VALUE rb_sSensorEvent = Qnil;
 
 VALUE event_get_type(sfEventType type) {
     static const char *const type_event_chr[] = {
@@ -173,7 +173,7 @@ VALUE cast_event_to_ruby(sfEvent event) {
 static VALUE rb_event_poll(VALUE self) {
     sfEvent event;
 
-    if (!windows_is_initialize()) {
+    if (!windows_is_initialized()) {
         raise_message_exception("Windows is not initialized");
     }
 
@@ -187,7 +187,7 @@ static VALUE rb_event_poll(VALUE self) {
 static VALUE rb_event_wait(VALUE self) {
     sfEvent event;
 
-    if (!windows_is_initialize()) {
+    if (!windows_is_initialized()) {
         raise_message_exception("Windows is not initialized");
     }
 
@@ -198,7 +198,7 @@ static VALUE rb_event_wait(VALUE self) {
     return Qnil;
 }
 
-void Init_events_klass(VALUE rb_module) {
+void Init_events_module(VALUE rb_module) {
     rb_mEvent = rb_define_module_under(rb_module, EVENTS_MODULE_NAME);
 
     // define structs

@@ -8,7 +8,7 @@
 
 #define EVENTS_MODULE_NAME              "Events"
 
-void Init_events_klass(VALUE rb_module);
+void Init_events_module(VALUE rb_module);
 
 VALUE get_events_module(void);
 

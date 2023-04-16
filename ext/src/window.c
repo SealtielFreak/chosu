@@ -5,12 +5,19 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#define IF_WINDOW_INITIALIZED() if(windows_is_initialized())
+#define SECURE_CALL_WINDOW(func) ({if(windows_is_initialized()) { func; } })
+
+char title_window[86] = DEFAULT_TITLE_WINDOW;
+sfVector2u size_window = DEFAULT_SIZE_WINDOW;
+
 static sfRenderWindow *m_window = NULL;
 static VALUE rb_mWindow = Qnil;
 static VALUE rb_block = Qnil;
 
 static VALUE rb_window_close(VALUE self) {
-    sfRenderWindow_close(m_window);
+    SECURE_CALL_WINDOW(sfRenderWindow_close(m_window));
+
     return Qnil;
 }
 
@@ -26,8 +33,8 @@ static VALUE rb_window_update(VALUE self) {
 
 static VALUE rb_window_show(VALUE self) {
     m_window = sfRenderWindow_create(
-            (sfVideoMode) {300, 300, 32},
-            "", sfDefaultStyle,
+            (sfVideoMode) {size_window.x, size_window.y, 32},
+            title_window, sfDefaultStyle,
             NULL
     );
 
@@ -45,12 +52,19 @@ static VALUE rb_window_show(VALUE self) {
 }
 
 static VALUE rb_window_set_size(VALUE self, VALUE rb_size) {
-    sfRenderWindow_setSize(m_window, cast_array_to_vec2u(rb_size));
+    size_window = cast_array_to_vec2u(rb_size);
+
+    SECURE_CALL_WINDOW(sfRenderWindow_setSize(m_window, size_window));
+
     return Qnil;
 }
 
 static VALUE rb_window_get_size(VALUE self) {
-    return cast_vec2u_to_array(sfRenderWindow_getSize(m_window));
+    if (windows_is_initialized()) {
+        return cast_vec2u_to_array(sfRenderWindow_getSize(m_window));
+    }
+
+    return cast_vec2u_to_array(size_window);
 }
 
 void Init_window_module(VALUE rb_module) {
@@ -72,6 +86,6 @@ sfRenderWindow *get_window_object() {
     return m_window;
 }
 
-bool windows_is_initialize() {
+bool windows_is_initialized() {
     return m_window != NULL;
 }
