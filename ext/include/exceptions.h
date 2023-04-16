@@ -1,7 +1,7 @@
 #ifndef CHOSU_RB_EXCEPTIONS_H
 #define CHOSU_RB_EXCEPTIONS_H
 
-#include "ruby.h"
+#include <ruby.h>
 
 void raise_invalid_argument_type(const char *type);
 

@@ -1,9 +1,9 @@
 #ifndef CHOSU_CASTING_H
 #define CHOSU_CASTING_H
 
-#include "ruby.h"
+#include <ruby.h>
 
-#include "SFML/System/Vector2.h"
+#include <SFML/System/Vector2.h>
 
 #define DEFAULT_LEN_VEC2                2
 

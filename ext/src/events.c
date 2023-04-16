@@ -199,7 +199,7 @@ static VALUE rb_event_wait(VALUE self) {
 }
 
 void Init_events_klass(VALUE rb_module) {
-    rb_mEvent = rb_define_module_under(rb_module, "Events");
+    rb_mEvent = rb_define_module_under(rb_module, EVENTS_MODULE_NAME);
 
     // define structs
     rb_sSizeEvent = rb_struct_define("SizeEvent", "width", "height", NULL);

@@ -1,11 +1,11 @@
 #ifndef CHOSU_WINDOW_H
 #define CHOSU_WINDOW_H
 
-#include "ruby.h"
+#include <ruby.h>
 
-#include "SFML/Window.h"
-#include "SFML/System.h"
-#include "SFML/Graphics.h"
+#include <SFML/Window.h>
+#include <SFML/System.h>
+#include <SFML/Graphics.h>
 
 #define WINDOWS_MODULE_NAME              "Window"
 
