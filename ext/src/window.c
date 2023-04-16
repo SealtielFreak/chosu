@@ -1,4 +1,5 @@
 #include "module/window.h"
+#include "casting.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,6 +35,17 @@ static VALUE rb_window_display(VALUE self) {
     return Qnil;
 }
 
+static VALUE rb_window_set_size(VALUE self, VALUE rb_size) {
+
+    sfRenderWindow_setSize(m_window, cast_array_to_vec2u(rb_size));
+
+    return Qnil;
+}
+
+static VALUE rb_window_get_size(VALUE self) {
+    return cast_vec2u_to_array(sfRenderWindow_getSize(m_window));
+}
+
 void window_destroy(void) {
     if (m_window != NULL) {
         sfRenderWindow_destroy(m_window);
@@ -46,6 +58,9 @@ void Init_window_module(VALUE rb_module) {
     rb_define_singleton_method(rb_mWindow, "create", rb_window_create, 0);
     rb_define_singleton_method(rb_mWindow, "close!", rb_window_close, 0);
     rb_define_singleton_method(rb_mWindow, "display", rb_window_display, 0);
+
+    rb_define_singleton_method(rb_mWindow, "size=", rb_window_set_size, 1);
+    rb_define_singleton_method(rb_mWindow, "size", rb_window_get_size, 0);
 
     atexit(window_destroy);
 }
