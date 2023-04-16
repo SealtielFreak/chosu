@@ -36,9 +36,7 @@ static VALUE rb_window_display(VALUE self) {
 }
 
 static VALUE rb_window_set_size(VALUE self, VALUE rb_size) {
-
     sfRenderWindow_setSize(m_window, cast_array_to_vec2u(rb_size));
-
     return Qnil;
 }
 
