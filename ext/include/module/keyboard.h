@@ -8,7 +8,7 @@
 
 #define KEYBOARD_MODULE_NAME              "Keyboard"
 
-void Init_keyboard_klass(VALUE rb_module);
+void Init_keyboard_module(VALUE rb_module);
 
 VALUE get_keyboard_module(void);
 

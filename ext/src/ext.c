@@ -17,5 +17,5 @@ void Init_extchosu(void) {
 
     Init_window_module(rb_mChosu);
     Init_events_module(rb_mChosu);
-    Init_keyboard_klass(rb_mChosu);
+    Init_keyboard_module(rb_mChosu);
 }
