@@ -6,17 +6,17 @@
 #include <stdbool.h>
 
 #define IF_WINDOW_INITIALIZED() if(windows_is_initialized())
-#define SECURE_CALL_WINDOW(func) ({if(windows_is_initialized()) { func; } })
+#define SECURE_CALL_WINDOW(func, ...) ({if(windows_is_initialized()) { func(__VA_ARGS__); } })
 
 char title_window[86] = DEFAULT_TITLE_WINDOW;
 sfVector2u size_window = DEFAULT_SIZE_WINDOW;
 
-static sfRenderWindow *m_window = NULL;
+static sfRenderWindow *c_mWindow = NULL;
 static VALUE rb_mWindow = Qnil;
 static VALUE rb_block = Qnil;
 
 static VALUE rb_window_close(VALUE self) {
-    SECURE_CALL_WINDOW(sfRenderWindow_close(m_window));
+    SECURE_CALL_WINDOW(sfRenderWindow_close, c_mWindow);
 
     return Qnil;
 }
@@ -32,21 +32,21 @@ static VALUE rb_window_update(VALUE self) {
 }
 
 static VALUE rb_window_show(VALUE self) {
-    m_window = sfRenderWindow_create(
+    c_mWindow = sfRenderWindow_create(
             (sfVideoMode) {size_window.x, size_window.y, 32},
             title_window, sfDefaultStyle,
             NULL
     );
 
-    while (sfRenderWindow_isOpen(m_window)) {
+    while (sfRenderWindow_isOpen(c_mWindow)) {
         if (!NIL_P(rb_block)) {
             rb_funcall(rb_block, rb_intern("call"), 0);
         }
 
-        sfRenderWindow_display(m_window);
+        sfRenderWindow_display(c_mWindow);
     }
 
-    sfRenderWindow_destroy(m_window);
+    sfRenderWindow_destroy(c_mWindow);
 
     return Qnil;
 }
@@ -54,14 +54,14 @@ static VALUE rb_window_show(VALUE self) {
 static VALUE rb_window_set_size(VALUE self, VALUE rb_size) {
     size_window = cast_array_to_vec2u(rb_size);
 
-    SECURE_CALL_WINDOW(sfRenderWindow_setSize(m_window, size_window));
+    SECURE_CALL_WINDOW(sfRenderWindow_setSize, c_mWindow, size_window);
 
     return Qnil;
 }
 
 static VALUE rb_window_get_size(VALUE self) {
     if (windows_is_initialized()) {
-        return cast_vec2u_to_array(sfRenderWindow_getSize(m_window));
+        return cast_vec2u_to_array(sfRenderWindow_getSize(c_mWindow));
     }
 
     return cast_vec2u_to_array(size_window);
@@ -83,9 +83,9 @@ VALUE get_window_module(void) {
 }
 
 sfRenderWindow *get_window_object() {
-    return m_window;
+    return c_mWindow;
 }
 
 bool windows_is_initialized() {
-    return m_window != NULL;
+    return c_mWindow != NULL;
 }
