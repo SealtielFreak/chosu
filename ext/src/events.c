@@ -202,6 +202,18 @@ void Init_events_klass(VALUE rb_module) {
     rb_mEvent = rb_define_module_under(rb_module, "Events");
 
     // define structs
+    rb_sSizeEvent = rb_struct_define("SizeEvent", "width", "height", NULL);
+    rb_sKeyEvent = rb_struct_define("KeyEvent", "code", "alt", "control", "shift", "system", NULL);
+    rb_sTextEvent = rb_struct_define("TextEvent", "unicode", NULL);
+    rb_sMouseMoveEvent = rb_struct_define("MouseMoveEvent", "x", "y", NULL);
+    rb_sMouseButtonEvent = rb_struct_define("MouseButtonEvent", "button", "x", "y", NULL);
+    rb_sMouseWheelEvent = rb_struct_define("MouseWheelEvent", "delta", "x", "y", NULL);
+    rb_sMouseWheelScrollEvent = rb_struct_define("MouseWheelScrollEvent", "wheel", "delta", "x", "y", NULL);
+    rb_sJoystickMoveEvent = rb_struct_define("JoystickMoveEvent", "id", "axis", "position", NULL);
+    rb_sJoystickButtonEvent = rb_struct_define("JoystickButtonEvent", "id", "button", NULL);
+    rb_sJoystickConnectEvent = rb_struct_define("JoystickConnectEvent", "id", NULL);
+    rb_sTouchEvent = rb_struct_define("TouchEvent", "finger", "x", "y", NULL);
+    rb_sSensorEvent = rb_struct_define("SensorEvent", "type", "x", "y", "z", NULL);
     rb_sEvent = rb_struct_define("Event",
                                  "type",
                                  "size",
@@ -218,25 +230,24 @@ void Init_events_klass(VALUE rb_module) {
                                  NULL
     );
 
-    rb_sSizeEvent = rb_struct_define("SizeEvent", "width", "height", NULL);
-    rb_sKeyEvent = rb_struct_define("KeyEvent", "code", "alt", "control", "shift", "system", NULL);
-    rb_sTextEvent = rb_struct_define("TextEvent", "unicode", NULL);
-
-    rb_sMouseMoveEvent = rb_struct_define("MouseMoveEvent", "x", "y", NULL);
-    rb_sMouseButtonEvent = rb_struct_define("MouseButtonEvent", "button", "x", "y", NULL);
-    rb_sMouseWheelEvent = rb_struct_define("MouseWheelEvent", "delta", "x", "y", NULL);
-    rb_sMouseWheelScrollEvent = rb_struct_define("MouseWheelScrollEvent", "wheel", "delta", "x", "y", NULL);
-
-    rb_sJoystickMoveEvent = rb_struct_define("JoystickMoveEvent", "id", "axis", "position", NULL);
-    rb_sJoystickButtonEvent = rb_struct_define("JoystickButtonEvent", "id", "button", NULL);
-    rb_sJoystickConnectEvent = rb_struct_define("JoystickConnectEvent", "id", NULL);
-
-    rb_sTouchEvent = rb_struct_define("TouchEvent", "finger", "x", "y", NULL);
-    rb_sSensorEvent = rb_struct_define("SensorEvent", "type", "x", "y", "z", NULL);
-
     // singleton methods
     rb_define_singleton_method(rb_mEvent, "poll", rb_event_poll, 0);
     rb_define_singleton_method(rb_mEvent, "wait", rb_event_wait, 0);
+
+    // define class under module
+    rb_sSizeEvent = rb_define_class_under(rb_module, "SizeEvent", rb_sSizeEvent);
+    rb_sKeyEvent = rb_define_class_under(rb_module, "KeyEvent", rb_sKeyEvent);
+    rb_sTextEvent = rb_define_class_under(rb_module, "TextEvent", rb_sTextEvent);
+    rb_sMouseMoveEvent = rb_define_class_under(rb_module, "MouseMoveEvent", rb_sMouseMoveEvent);
+    rb_sMouseButtonEvent = rb_define_class_under(rb_module, "MouseButtonEvent", rb_sMouseButtonEvent);
+    rb_sMouseWheelEvent = rb_define_class_under(rb_module, "MouseWheelEvent", rb_sMouseWheelEvent);
+    rb_sMouseWheelScrollEvent = rb_define_class_under(rb_module, "MouseWheelScrollEvent", rb_sMouseWheelScrollEvent);
+    rb_sJoystickMoveEvent = rb_define_class_under(rb_module, "JoystickMoveEvent", rb_sJoystickMoveEvent);
+    rb_sJoystickButtonEvent = rb_define_class_under(rb_module, "JoystickButtonEvent", rb_sJoystickButtonEvent);
+    rb_sJoystickConnectEvent = rb_define_class_under(rb_module, "JoystickConnectEvent", rb_sJoystickConnectEvent);
+    rb_sTouchEvent = rb_define_class_under(rb_module, "TouchEvent", rb_sTouchEvent);
+    rb_sSensorEvent = rb_define_class_under(rb_module, "SensorEvent", rb_sSensorEvent);
+    rb_sEvent = rb_define_class_under(rb_module, "Event", rb_sEvent);
 }
 
 VALUE get_events_module(void) {
