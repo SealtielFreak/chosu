@@ -19,8 +19,18 @@ static VALUE rb_window_create(VALUE self) {
     return Qnil;
 }
 
-static VALUE rb_window_show(VALUE self) {
-    sfRenderWindow_display(m_window);
+static VALUE rb_window_close(VALUE self) {
+    sfRenderWindow_close(m_window);
+    return Qnil;
+}
+
+static VALUE rb_window_display(VALUE self) {
+    while(sfRenderWindow_isOpen(m_window)) {
+        rb_yield(rb_float_new(1.0));
+
+        sfRenderWindow_display(m_window);
+    }
+
     return Qnil;
 }
 
@@ -34,7 +44,8 @@ void Init_window_module(VALUE rb_module) {
     rb_mWindow = rb_define_module_under(rb_module, WINDOWS_MODULE_NAME);
 
     rb_define_singleton_method(rb_mWindow, "create", rb_window_create, 0);
-    rb_define_singleton_method(rb_mWindow, "show", rb_window_show, 0);
+    rb_define_singleton_method(rb_mWindow, "close!", rb_window_close, 0);
+    rb_define_singleton_method(rb_mWindow, "display", rb_window_display, 0);
 
     atexit(window_destroy);
 }
@@ -43,7 +54,7 @@ VALUE get_window_module(void) {
     return rb_mWindow;
 }
 
-sfRenderWindow *get_render_window() {
+sfRenderWindow *get_window_object() {
     return m_window;
 }
 

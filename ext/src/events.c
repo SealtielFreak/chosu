@@ -1,5 +1,5 @@
 #include "module/window.h"
-#include "module/event.h"
+#include "module/events.h"
 #include "ostruct.h"
 #include "exceptions.h"
 #include "boolean.h"
@@ -10,6 +10,7 @@
 
 static VALUE rb_mEvent;
 
+static VALUE rb_sEvent;
 static VALUE rb_sSizeEvent;
 static VALUE rb_sKeyEvent;
 static VALUE rb_sTextEvent;
@@ -23,7 +24,7 @@ static VALUE rb_sJoystickConnectEvent;
 static VALUE rb_sTouchEvent;
 static VALUE rb_sSensorEvent;
 
-VALUE event_get_type(sfEvent event) {
+VALUE event_get_type(sfEventType type) {
     static const char *const type_event_chr[] = {
             "closed",
             "resized",
@@ -51,21 +52,19 @@ VALUE event_get_type(sfEvent event) {
             "count",
     };
 
-    return rb_str_new_cstr(type_event_chr[event.type]);
+    return rb_str_new_cstr(type_event_chr[type]);
 }
 
-VALUE event_get_size_event(sfEvent event) {
+VALUE event_get_size_event(sfSizeEvent size) {
     return rb_struct_new(rb_sSizeEvent,
-                         UINT2NUM(event.size.width),
-                         UINT2NUM(event.size.height),
-                         INT2NUM(event.size.type)
+                         UINT2NUM(size.width),
+                         UINT2NUM(size.height),
+                         INT2NUM(size.type)
     );
 }
 
-VALUE event_get_key_event(sfEvent event) {
-    sfKeyEvent key = event.key;
+VALUE event_get_key_event(sfKeyEvent key) {
     const char code = key.code;
-
 
     return rb_struct_new(rb_sKeyEvent,
                          rb_str_new_cstr((const char *) &code),
@@ -76,8 +75,7 @@ VALUE event_get_key_event(sfEvent event) {
     );
 }
 
-VALUE event_get_text_event(sfEvent event) {
-    sfTextEvent text = event.text;
+VALUE event_get_text_event(sfTextEvent text) {
     const unsigned char code = text.unicode;
 
     return rb_struct_new(rb_sTextEvent,
@@ -85,18 +83,14 @@ VALUE event_get_text_event(sfEvent event) {
     );
 }
 
-VALUE event_get_mouse_move_event(sfEvent event) {
-    sfMouseMoveEvent move = event.mouseMove;
-
+VALUE event_get_mouse_move_event(sfMouseMoveEvent move) {
     return rb_struct_new(rb_sMouseMoveEvent,
                          INT2NUM(move.x),
                          INT2NUM(move.y)
     );
 }
 
-VALUE event_get_mouse_button_event(sfEvent event) {
-    sfMouseButtonEvent button = event.mouseButton;
-
+VALUE event_get_mouse_button_event(sfMouseButtonEvent button) {
     return rb_struct_new(rb_sMouseButtonEvent,
                          INT2NUM(button.button),
                          INT2NUM(button.x),
@@ -104,9 +98,7 @@ VALUE event_get_mouse_button_event(sfEvent event) {
     );
 }
 
-VALUE event_get_mouse_wheel_event(sfEvent event) {
-    sfMouseWheelEvent wheel = event.mouseWheel;
-
+VALUE event_get_mouse_wheel_event(sfMouseWheelEvent wheel) {
     return rb_struct_new(rb_sMouseWheelEvent,
                          INT2NUM(wheel.delta),
                          INT2NUM(wheel.x),
@@ -114,9 +106,7 @@ VALUE event_get_mouse_wheel_event(sfEvent event) {
     );
 }
 
-VALUE event_get_mouse_wheel_scroll_event(sfEvent event) {
-    sfMouseWheelScrollEvent scroll = event.mouseWheelScroll;
-
+VALUE event_get_mouse_wheel_scroll_event(sfMouseWheelScrollEvent scroll) {
     return rb_struct_new(rb_sMouseWheelScrollEvent,
                          UINT2NUM(scroll.wheel),
                          rb_float_new(scroll.delta),
@@ -125,9 +115,7 @@ VALUE event_get_mouse_wheel_scroll_event(sfEvent event) {
     );
 }
 
-VALUE event_get_joystick_move_event(sfEvent event) {
-    sfJoystickMoveEvent joystick = event.joystickMove;
-
+VALUE event_get_joystick_move_event(sfJoystickMoveEvent joystick) {
     return rb_struct_new(rb_sJoystickMoveEvent,
                          UINT2NUM(joystick.joystickId),
                          UINT2NUM(joystick.axis),
@@ -135,26 +123,20 @@ VALUE event_get_joystick_move_event(sfEvent event) {
     );
 }
 
-VALUE event_get_joystick_button_event(sfEvent event) {
-    sfJoystickButtonEvent joystick = event.joystickButton;
-
+VALUE event_get_joystick_button_event(sfJoystickButtonEvent joystick) {
     return rb_struct_new(rb_sJoystickButtonEvent,
                          UINT2NUM(joystick.joystickId),
                          UINT2NUM(joystick.button)
     );
 }
 
-VALUE event_get_joystick_connect_event(sfEvent event) {
-    sfJoystickConnectEvent joystick = event.joystickConnect;
-
+VALUE event_get_joystick_connect_event(sfJoystickConnectEvent joystick) {
     return rb_struct_new(rb_sJoystickConnectEvent,
                          UINT2NUM(joystick.joystickId)
     );
 }
 
-VALUE event_get_touch_event(sfEvent event) {
-    sfTouchEvent touch = event.touch;
-
+VALUE event_get_touch_event(sfTouchEvent touch) {
     return rb_struct_new(rb_sTouchEvent,
                          UINT2NUM(touch.finger),
                          INT2NUM(touch.x),
@@ -162,9 +144,7 @@ VALUE event_get_touch_event(sfEvent event) {
     );
 }
 
-VALUE event_get_sensor_event(sfEvent event) {
-    sfSensorEvent sensor = event.sensor;
-
+VALUE event_get_sensor_event(sfSensorEvent sensor) {
     return rb_struct_new(rb_sSensorEvent,
                          UINT2NUM(sensor.sensorType),
                          rb_float_new(sensor.x),
@@ -174,12 +154,20 @@ VALUE event_get_sensor_event(sfEvent event) {
 }
 
 VALUE cast_event_to_ruby(sfEvent event) {
-    VALUE rb_event = rb_hash_new();
-
-    rb_hash_aset(rb_event, ID2SYM(rb_intern("type")), event_get_type(event));
-    rb_hash_aset(rb_event, ID2SYM(rb_intern("size")), event_get_size_event(event));
-
-    return rb_event;
+    return rb_struct_new(rb_sEvent,
+                         event_get_type(event.type),
+                         event_get_size_event(event.size),
+                         event_get_text_event(event.text),
+                         event_get_mouse_move_event(event.mouseMove),
+                         event_get_mouse_button_event(event.mouseButton),
+                         event_get_mouse_wheel_event(event.mouseWheel),
+                         event_get_mouse_wheel_scroll_event(event.mouseWheelScroll),
+                         event_get_joystick_move_event(event.joystickMove),
+                         event_get_joystick_button_event(event.joystickButton),
+                         event_get_joystick_connect_event(event.joystickConnect),
+                         event_get_touch_event(event.touch),
+                         event_get_sensor_event(event.sensor)
+    );
 }
 
 static VALUE rb_event_poll(VALUE self) {
@@ -189,7 +177,7 @@ static VALUE rb_event_poll(VALUE self) {
         raise_message_exception("Windows is not initialized");
     }
 
-    while (sfRenderWindow_pollEvent(get_render_window(), &event) != 0) {
+    while (sfRenderWindow_pollEvent(get_window_object(), &event) != 0) {
         rb_yield(cast_event_to_ruby(event));
     }
 
@@ -203,17 +191,33 @@ static VALUE rb_event_wait(VALUE self) {
         raise_message_exception("Windows is not initialized");
     }
 
-    while (sfRenderWindow_waitEvent(get_render_window(), &event) != 0) {
+    while (sfRenderWindow_waitEvent(get_window_object(), &event) != 0) {
         rb_yield(cast_event_to_ruby(event));
     }
 
     return Qnil;
 }
 
-void Init_event_klass(VALUE rb_module) {
-    rb_mEvent = rb_define_module_under(rb_module, "Event");
+void Init_events_klass(VALUE rb_module) {
+    rb_mEvent = rb_define_module_under(rb_module, "Events");
 
     // define structs
+    rb_sEvent = rb_struct_define("Event",
+                                 "type",
+                                 "size",
+                                 "text",
+                                 "mouse_move",
+                                 "mouse_button",
+                                 "mouse_wheel",
+                                 "mouse_wheel_scroll",
+                                 "joystick_move",
+                                 "joystick_button",
+                                 "joystick_connect",
+                                 "touch",
+                                 "sensor",
+                                 NULL
+    );
+
     rb_sSizeEvent = rb_struct_define("SizeEvent", "width", "height", NULL);
     rb_sKeyEvent = rb_struct_define("KeyEvent", "code", "alt", "control", "shift", "system", NULL);
     rb_sTextEvent = rb_struct_define("TextEvent", "unicode", NULL);
@@ -231,10 +235,10 @@ void Init_event_klass(VALUE rb_module) {
     rb_sSensorEvent = rb_struct_define("SensorEvent", "type", "x", "y", "z", NULL);
 
     // singleton methods
-    rb_define_singleton_method(rb_mEvent, "poll!", rb_event_poll, 0);
-    rb_define_singleton_method(rb_mEvent, "wait!", rb_event_wait, 0);
+    rb_define_singleton_method(rb_mEvent, "poll", rb_event_poll, 0);
+    rb_define_singleton_method(rb_mEvent, "wait", rb_event_wait, 0);
 }
 
-VALUE get_event_module(void) {
+VALUE get_events_module(void) {
     return rb_mEvent;
 }

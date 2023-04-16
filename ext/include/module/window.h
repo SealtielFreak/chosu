@@ -13,7 +13,7 @@ void Init_window_module(VALUE rb_module);
 
 VALUE get_window_module(void);
 
-sfRenderWindow * get_render_window();
+sfRenderWindow * get_window_object();
 
 bool windows_is_initialize();
 
