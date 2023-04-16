@@ -10,7 +10,7 @@ else
 end
 
 %w[
-  csfml-graphics csfml-audio csfml-network csfml-window csfml-system
+  freeglut opengl32 csfml-graphics csfml-audio csfml-network csfml-window csfml-system
 ].each { |l| abort unless have_library(l) }
 
 create_makefile 'extchosu', 'src'
