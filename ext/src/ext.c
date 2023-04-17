@@ -2,6 +2,7 @@
 #include "module/window.h"
 #include "module/events.h"
 #include "module/keyboard.h"
+#include "module/graphics.h"
 #include "demo_3d.h"
 
 #include <stdio.h>
@@ -18,4 +19,5 @@ void Init_extchosu(void) {
     Init_window_module(rb_mChosu);
     Init_events_module(rb_mChosu);
     Init_keyboard_module(rb_mChosu);
+    Init_graphics_module(rb_mChosu);
 }

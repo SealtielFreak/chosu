@@ -5,66 +5,96 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#define IF_WINDOW_INITIALIZED() if(windows_is_initialized())
-#define SECURE_CALL_WINDOW(func, ...) ({if(windows_is_initialized()) { func(__VA_ARGS__); } })
+char c_oTitleWindow[86] = DEFAULT_TITLE_WINDOW;
+sfVector2u c_oSizeWindow = DEFAULT_SIZE_WINDOW;
+sfColor c_oColor = DEFAULT_BACKGROUND_WINDOW;
 
-char title_window[86] = DEFAULT_TITLE_WINDOW;
-sfVector2u size_window = DEFAULT_SIZE_WINDOW;
-
-static sfRenderWindow *c_mWindow = NULL;
+static sfRenderWindow *c_oWindow = NULL;
 static VALUE rb_mWindow = Qnil;
-static VALUE rb_block = Qnil;
+static VALUE rb_oUpdateBlock = Qnil;
 
 static VALUE rb_window_close(VALUE self) {
-    SECURE_CALL_WINDOW(sfRenderWindow_close, c_mWindow);
+    Secure_Call_Window(sfRenderWindow_close, c_oWindow);
 
     return Qnil;
 }
 
 static VALUE rb_window_update(VALUE self) {
-    rb_block = rb_block_proc();
+    rb_oUpdateBlock = rb_block_proc();
 
-    if (NIL_P(rb_block)) {
-        rb_raise(rb_eArgError, "No rb_block given");
+    if (NIL_P(rb_oUpdateBlock)) {
+        rb_raise(rb_eArgError, "No rb_oUpdateBlock given");
     }
 
     return Qnil;
 }
 
 static VALUE rb_window_show(VALUE self) {
-    c_mWindow = sfRenderWindow_create(
-            (sfVideoMode) {size_window.x, size_window.y, 32},
-            title_window, sfDefaultStyle,
+    c_oWindow = sfRenderWindow_create(
+            (sfVideoMode) {c_oSizeWindow.x, c_oSizeWindow.y, 32},
+            c_oTitleWindow, sfDefaultStyle,
             NULL
     );
 
-    while (sfRenderWindow_isOpen(c_mWindow)) {
-        if (!NIL_P(rb_block)) {
-            rb_funcall(rb_block, rb_intern("call"), 0);
+    while (sfRenderWindow_isOpen(c_oWindow)) {
+        sfRenderWindow_clear(c_oWindow, c_oColor);
+
+        if (!NIL_P(rb_oUpdateBlock)) {
+            rb_funcall(rb_oUpdateBlock, rb_intern("call"), 0);
         }
 
-        sfRenderWindow_display(c_mWindow);
+        sfRenderWindow_display(c_oWindow);
     }
 
-    sfRenderWindow_destroy(c_mWindow);
+    sfRenderWindow_destroy(c_oWindow);
+
+    c_oWindow = NULL;
 
     return Qnil;
 }
 
 static VALUE rb_window_set_size(VALUE self, VALUE rb_size) {
-    size_window = cast_array_to_vec2u(rb_size);
+    c_oSizeWindow = cast_array_to_vec2u(rb_size);
 
-    SECURE_CALL_WINDOW(sfRenderWindow_setSize, c_mWindow, size_window);
+    Secure_Call_Window(sfRenderWindow_setSize, c_oWindow, c_oSizeWindow);
 
     return Qnil;
 }
 
 static VALUE rb_window_get_size(VALUE self) {
     if (windows_is_initialized()) {
-        return cast_vec2u_to_array(sfRenderWindow_getSize(c_mWindow));
+        return cast_vec2u_to_array(sfRenderWindow_getSize(c_oWindow));
     }
 
-    return cast_vec2u_to_array(size_window);
+    return cast_vec2u_to_array(c_oSizeWindow);
+}
+
+static VALUE rb_window_set_title(VALUE self, VALUE rb_title) {
+    strcpy(c_oTitleWindow, StringValueCStr(rb_title));
+
+    Secure_Call_Window(sfRenderWindow_setTitle, c_oWindow, c_oTitleWindow);
+
+    return Qnil;
+}
+
+static VALUE rb_window_get_title(VALUE self) {
+    if (windows_is_initialized()) {
+        return cast_vec2u_to_array(sfRenderWindow_getSize(c_oWindow));
+    }
+
+    return rb_str_new_cstr(c_oTitleWindow);
+}
+
+static VALUE rb_window_set_color(VALUE self, VALUE rb_color) {
+    c_oColor = cast_array_to_color(rb_color);
+
+    Secure_Call_Window(sfRenderWindow_clear, c_oWindow, c_oColor);
+
+    return Qnil;
+}
+
+static VALUE rb_window_get_color(VALUE self) {
+    return cast_color_to_array(c_oColor);
 }
 
 void Init_window_module(VALUE rb_module) {
@@ -76,6 +106,10 @@ void Init_window_module(VALUE rb_module) {
 
     rb_define_singleton_method(rb_mWindow, "size=", rb_window_set_size, 1);
     rb_define_singleton_method(rb_mWindow, "size", rb_window_get_size, 0);
+    rb_define_singleton_method(rb_mWindow, "title=", rb_window_set_title, 1);
+    rb_define_singleton_method(rb_mWindow, "title", rb_window_get_title, 0);
+    rb_define_singleton_method(rb_mWindow, "background=", rb_window_set_color, 1);
+    rb_define_singleton_method(rb_mWindow, "background", rb_window_get_color, 0);
 }
 
 VALUE get_window_module(void) {
@@ -83,9 +117,9 @@ VALUE get_window_module(void) {
 }
 
 sfRenderWindow *get_window_object() {
-    return c_mWindow;
+    return c_oWindow;
 }
 
 bool windows_is_initialized() {
-    return c_mWindow != NULL;
+    return c_oWindow != NULL;
 }
