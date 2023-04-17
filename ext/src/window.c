@@ -1,5 +1,4 @@
 #include "module/window.h"
-#include "module/events.h"
 #include "casting.h"
 #include "drawable.h"
 
@@ -40,17 +39,6 @@ static VALUE rb_window_show(VALUE self) {
 
     while (sfRenderWindow_isOpen(c_oWindow)) {
         sfRenderWindow_clear(c_oWindow, c_oColor);
-
-        sfEvent c_event;
-        while(sfRenderWindow_pollEvent(c_oWindow, &c_event)) {
-            VALUE rb_hash_events = get_events_hash();
-            VALUE rb_event = cast_event_to_ruby(c_event);
-            VALUE rb_proc = rb_hash_aref(rb_hash_events, event_get_type(c_event.type));
-
-            if (!NIL_P(rb_proc)) {
-                rb_proc_call(rb_proc, rb_ary_new());
-            }
-        }
 
         if (!NIL_P(rb_oUpdateBlock)) {
             rb_funcall(rb_oUpdateBlock, rb_intern("call"), 0);

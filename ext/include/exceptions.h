@@ -15,6 +15,4 @@ void raise_method_no_implemented(const char *method);
 
 void raise_message_exception(const char *type);
 
-void raise_block_expected(void);
-
 #endif //CHOSU_RB_EXCEPTIONS_H
