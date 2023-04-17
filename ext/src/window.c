@@ -44,9 +44,8 @@ static VALUE rb_window_show(VALUE self) {
             rb_funcall(rb_oUpdateBlock, rb_intern("call"), 0);
         }
 
-        const VALUE rb_oDrawableArray = get_drawable_array();
-        for(size_t i = 0; i < RARRAY_LEN(rb_oDrawableArray); i++) {
-            rb_funcall(rb_ary_entry(rb_oDrawableArray, (long) i), rb_intern("draw"), 0);
+        for(size_t i = 0; i < drawable_array_len(); i++) {
+            rb_funcall(rb_ary_entry(get_drawable_array(), (long) i), rb_intern("draw"), 0);
         }
 
         sfRenderWindow_display(c_oWindow);
