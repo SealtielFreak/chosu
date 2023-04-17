@@ -1,5 +1,6 @@
 #include "module/window.h"
 #include "casting.h"
+#include "drawable.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,6 +42,11 @@ static VALUE rb_window_show(VALUE self) {
 
         if (!NIL_P(rb_oUpdateBlock)) {
             rb_funcall(rb_oUpdateBlock, rb_intern("call"), 0);
+        }
+
+        const VALUE rb_oDrawableArray = get_drawable_array();
+        for(size_t i = 0; i < RARRAY_LEN(rb_oDrawableArray); i++) {
+            rb_funcall(rb_ary_entry(rb_oDrawableArray, (long) i), rb_intern("draw"), 0);
         }
 
         sfRenderWindow_display(c_oWindow);

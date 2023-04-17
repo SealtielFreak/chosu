@@ -5,6 +5,12 @@
 
 VALUE get_drawable_array(void);
 
-#define PUSH_DRAWABLE(rb_obj) ({rb_ary_push(get_drawable_array(), rb_obj);})
+void add_drawable_array(VALUE rb_obj);
+
+void remove_drawable_array(VALUE rb_obj);
+
+void clear_drawable_array(void);
+
+size_t drawable_array_len(void);
 
 #endif //CHOSU_DRAWABLE_H

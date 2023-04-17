@@ -22,12 +22,11 @@ static VALUE rb_circle_new(int argc, VALUE *argv, VALUE klass) {
 
     rb_obj_call_init(self, argc, argv);
 
-    PUSH_DRAWABLE(self);
-
     return self;
 }
 
 static VALUE rb_circle_init(int argc, VALUE *argv, VALUE self) {
+    rb_funcall(self, rb_intern("add"), 0);
     return self;
 }
 
@@ -40,18 +39,12 @@ static VALUE rb_circle_draw(VALUE self) {
 }
 
 static VALUE rb_circle_add(VALUE self) {
-    sfCircleShape *c_circle = Data_Get_Circle(self);
-
-    /* nothing */
-
+    add_drawable_array(self);
     return Qnil;
 }
 
 static VALUE rb_circle_remove(VALUE self) {
-    sfCircleShape *c_circle = Data_Get_Circle(self);
-
-    /* nothing */
-
+    remove_drawable_array(self);
     return Qnil;
 }
 
@@ -129,6 +122,7 @@ void Init_circle_klass(VALUE rb_module) {
 
     rb_define_method(rb_cCircle, "initialize", rb_circle_init, -1);
     rb_define_method(rb_cCircle, "draw", rb_circle_draw, 0);
+    rb_define_method(rb_cCircle, "add", rb_circle_add, 0);
     rb_define_method(rb_cCircle, "remove", rb_circle_remove, 0);
     rb_define_method(rb_cCircle, "fill_color=", rb_circle_set_fill_color, 1);
     rb_define_method(rb_cCircle, "fill_color", rb_circle_get_fill_color, 0);
