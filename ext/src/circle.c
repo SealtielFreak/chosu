@@ -31,9 +31,7 @@ static VALUE rb_circle_init(int argc, VALUE *argv, VALUE self) {
 }
 
 static VALUE rb_circle_draw(VALUE self) {
-    sfCircleShape *c_circle = Data_Get_Circle(self);
-
-    Secure_Call_Window(sfRenderWindow_drawCircleShape, get_window_object(), c_circle, NULL);
+    Secure_Call_Window(sfRenderWindow_drawCircleShape, get_window_object(), Data_Get_Circle(self), NULL);
 
     return Qnil;
 }

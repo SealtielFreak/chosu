@@ -14,7 +14,7 @@ VALUE rb_add_drawable(VALUE self) {
 }
 
 VALUE rb_remove_drawable(VALUE self) {
-    rb_remove_drawable(self);
+    remove_drawable_array(self);
 
     return Qnil;
 }

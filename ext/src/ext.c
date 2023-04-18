@@ -11,7 +11,7 @@
 static VALUE rb_mChosu = Qnil;
 static VALUE rb_oHandlerCallbacks = Qnil;
 
-static VALUE rb_get_handler(VALUE self, VALUE rb_key) {
+static VALUE rb_get_handler(VALUE self) {
     return rb_oHandlerCallbacks;
 }
 
