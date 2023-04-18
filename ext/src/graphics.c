@@ -4,7 +4,7 @@
 
 static VALUE rb_mGraphics = Qnil;
 
-VALUE rb_get_drawable_array(VALUE self) {
+static VALUE rb_get_drawable_array(VALUE self) {
     return get_drawable_array();
 }
 
