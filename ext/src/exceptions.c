@@ -50,3 +50,7 @@ void raise_message_exception(const char *type) {
 
     rb_raise(rb_eException, "%s", msg);
 }
+
+void raise_block_except(void) {
+    raise_message_exception("Block execution except");
+}

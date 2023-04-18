@@ -1,6 +1,6 @@
 #include "module/window.h"
 #include "casting.h"
-#include "drawable.h"
+#include "exceptions.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,10 +9,23 @@
 char c_oTitleWindow[86] = DEFAULT_TITLE_WINDOW;
 sfVector2u c_oSizeWindow = DEFAULT_SIZE_WINDOW;
 sfColor c_oColor = DEFAULT_BACKGROUND_WINDOW;
+sfBool c_oCurrentActive = sfTrue;
 
 static sfRenderWindow *c_oWindow = NULL;
 static VALUE rb_mWindow = Qnil;
-static VALUE rb_oUpdateBlock = Qnil;
+static VALUE rb_oOnEvents = Qnil;
+
+static VALUE rb_window_is_open(VALUE self) {
+    if(!windows_is_initialized()) {
+        return Qfalse;
+    }
+
+    if(sfRenderWindow_isOpen(c_oWindow)) {
+        return Qtrue;
+    }
+
+    return Qfalse;
+}
 
 static VALUE rb_window_close(VALUE self) {
     Secure_Call_Window(sfRenderWindow_close, c_oWindow);
@@ -20,40 +33,14 @@ static VALUE rb_window_close(VALUE self) {
     return Qnil;
 }
 
-static VALUE rb_window_update(VALUE self) {
-    rb_oUpdateBlock = rb_block_proc();
-
-    if (NIL_P(rb_oUpdateBlock)) {
-        rb_raise(rb_eArgError, "No rb_oUpdateBlock given");
-    }
+static VALUE rb_window_present(VALUE self) {
+    Secure_Call_Window(sfRenderWindow_display, c_oWindow);
 
     return Qnil;
 }
 
-static VALUE rb_window_show(VALUE self) {
-    c_oWindow = sfRenderWindow_create(
-            (sfVideoMode) {c_oSizeWindow.x, c_oSizeWindow.y, 32},
-            c_oTitleWindow, sfDefaultStyle,
-            NULL
-    );
-
-    while (sfRenderWindow_isOpen(c_oWindow)) {
-        sfRenderWindow_clear(c_oWindow, c_oColor);
-
-        if (!NIL_P(rb_oUpdateBlock)) {
-            rb_funcall(rb_oUpdateBlock, rb_intern("call"), 0);
-        }
-
-        for(size_t i = 0; i < drawable_array_len(); i++) {
-            rb_funcall(rb_ary_entry(get_drawable_array(), (long) i), rb_intern("draw"), 0);
-        }
-
-        sfRenderWindow_display(c_oWindow);
-    }
-
-    sfRenderWindow_destroy(c_oWindow);
-
-    c_oWindow = NULL;
+static VALUE rb_window_request_focus(VALUE self) {
+    Secure_Call_Window(sfRenderWindow_requestFocus, c_oWindow);
 
     return Qnil;
 }
@@ -102,12 +89,35 @@ static VALUE rb_window_get_color(VALUE self) {
     return cast_color_to_array(c_oColor);
 }
 
+static VALUE rb_window_create(VALUE self) {
+    if(!windows_is_initialized()) {
+        c_oWindow = sfRenderWindow_create(
+                (sfVideoMode) {c_oSizeWindow.x, c_oSizeWindow.y, 32},
+                c_oTitleWindow, sfDefaultStyle,
+                NULL
+        );
+    }
+
+    return Qnil;
+}
+
+static VALUE rb_window_destroy(VALUE self) {
+    if(windows_is_initialized()) {
+        sfRenderWindow_destroy(c_oWindow);
+    }
+
+    c_oWindow = NULL;
+
+    return Qnil;
+}
+
 void Init_window_module(VALUE rb_module) {
     rb_mWindow = rb_define_module_under(rb_module, WINDOWS_MODULE_NAME);
 
+    rb_define_singleton_method(rb_mWindow, "open?", rb_window_is_open, 0);
     rb_define_singleton_method(rb_mWindow, "close!", rb_window_close, 0);
-    rb_define_singleton_method(rb_mWindow, "update", rb_window_update, 0);
-    rb_define_singleton_method(rb_mWindow, "show!", rb_window_show, 0);
+    rb_define_singleton_method(rb_mWindow, "present!", rb_window_present, 0);
+    rb_define_singleton_method(rb_mWindow, "focus!", rb_window_request_focus, 0);
 
     rb_define_singleton_method(rb_mWindow, "size=", rb_window_set_size, 1);
     rb_define_singleton_method(rb_mWindow, "size", rb_window_get_size, 0);
@@ -115,6 +125,9 @@ void Init_window_module(VALUE rb_module) {
     rb_define_singleton_method(rb_mWindow, "title", rb_window_get_title, 0);
     rb_define_singleton_method(rb_mWindow, "background=", rb_window_set_color, 1);
     rb_define_singleton_method(rb_mWindow, "background", rb_window_get_color, 0);
+
+    rb_define_singleton_method(rb_mWindow, "create", rb_window_create, 0);
+    rb_define_singleton_method(rb_mWindow, "quit", rb_window_destroy, 0);
 }
 
 VALUE get_window_module(void) {
@@ -126,5 +139,21 @@ sfRenderWindow *get_window_object() {
 }
 
 bool windows_is_initialized() {
-    return c_oWindow != NULL;
+    return get_window_object() != NULL;
+}
+
+bool windows_is_open() {
+    if(windows_is_initialized()) {
+        return sfRenderWindow_isOpen(get_window_object());
+    }
+
+    return false;
+}
+
+bool windows_is_active() {
+    if(windows_is_initialized()) {
+        return sfRenderWindow_setActive(get_window_object(), c_oCurrentActive);
+    }
+
+    return false;
 }

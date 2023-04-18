@@ -7,6 +7,8 @@
 #include <SFML/System.h>
 #include <SFML/Graphics.h>
 
+#include <stdbool.h>
+
 #define WINDOWS_MODULE_NAME                     "Window"
 #define DEFAULT_TITLE_WINDOW                    "chosu"
 #define DEFAULT_SIZE_WINDOW                     { 640, 480 };
@@ -20,6 +22,10 @@ VALUE get_window_module(void);
 sfRenderWindow * get_window_object();
 
 bool windows_is_initialized();
+
+bool windows_is_open();
+
+bool windows_is_active();
 
 #define Secure_Call_Window(func, ...) ({if(windows_is_initialized()) { func(__VA_ARGS__); } })
 

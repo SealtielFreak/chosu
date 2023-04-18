@@ -81,3 +81,7 @@ VALUE cast_color_to_array(sfColor color) {
 
     return rb_array;
 }
+
+const char *cast_symbol_to_string(VALUE rb_sym) {
+    return rb_id2name(SYM2ID(rb_sym));
+}
