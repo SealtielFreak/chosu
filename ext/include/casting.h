@@ -24,4 +24,6 @@ VALUE cast_vec2f_to_array(sfVector2f vec2);
 
 VALUE cast_color_to_array(sfColor color);
 
+const char * cast_symbol_to_string(VALUE rb_sym);
+
 #endif //CHOSU_CASTING_H

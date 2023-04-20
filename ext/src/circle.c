@@ -31,20 +31,8 @@ static VALUE rb_circle_init(int argc, VALUE *argv, VALUE self) {
 }
 
 static VALUE rb_circle_draw(VALUE self) {
-    sfCircleShape *c_circle = Data_Get_Circle(self);
+    Secure_Call_Window(sfRenderWindow_drawCircleShape, get_window_object(), Data_Get_Circle(self), NULL);
 
-    Secure_Call_Window(sfRenderWindow_drawCircleShape, get_window_object(), c_circle, NULL);
-
-    return Qnil;
-}
-
-static VALUE rb_circle_add(VALUE self) {
-    add_drawable_array(self);
-    return Qnil;
-}
-
-static VALUE rb_circle_remove(VALUE self) {
-    remove_drawable_array(self);
     return Qnil;
 }
 
@@ -118,12 +106,12 @@ static VALUE rb_circle_get_transform(VALUE self) {
 void Init_circle_klass(VALUE rb_module) {
     rb_cCircle = rb_define_class_under(rb_module, "Circle", rb_cObject);
 
+    rb_include_module(rb_cCircle, get_drawable_module());
+
     rb_define_singleton_method(rb_cCircle, "new", rb_circle_new, -1);
 
     rb_define_method(rb_cCircle, "initialize", rb_circle_init, -1);
     rb_define_method(rb_cCircle, "draw", rb_circle_draw, 0);
-    rb_define_method(rb_cCircle, "add", rb_circle_add, 0);
-    rb_define_method(rb_cCircle, "remove", rb_circle_remove, 0);
     rb_define_method(rb_cCircle, "fill_color=", rb_circle_set_fill_color, 1);
     rb_define_method(rb_cCircle, "fill_color", rb_circle_get_fill_color, 0);
     rb_define_method(rb_cCircle, "outline_color=", rb_circle_set_outline_color, 1);
